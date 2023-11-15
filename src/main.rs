@@ -1,8 +1,6 @@
 mod conn;
-
+use conn::connection;
 use actix_web::{web, App, HttpServer, Responder};
-use dotenv::dotenv;
-use conn::connect;
 
 async fn index() -> impl Responder {
     "Hello world!"
@@ -10,14 +8,13 @@ async fn index() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-
-    dotenv().ok();
-    let pool = connect().await?;
+    connection();
 
     HttpServer::new(|| {
         App::new().service(
             web::scope("/app")
-                .route("/index.html", web::get().to(index)),
+                .route("/index.html", web::get().to(index))
+                .route("/conn.rs", web::get().to(connection))
         )
     })
     .bind(("0.0.0.0", 8080))?
