@@ -8,7 +8,6 @@ async fn index() -> impl Responder {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    connection();
 
     HttpServer::new(|| {
         App::new().service(

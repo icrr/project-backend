@@ -1,4 +1,4 @@
-use actix_web::{web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{HttpResponse};
 use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
