@@ -3,7 +3,7 @@ use dotenv::dotenv;
 use sqlx::postgres::PgPoolOptions;
 use std::env;
 
-pub async fn connection() -> HttpResponse {
+pub async fn _connect() -> HttpResponse {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("DATABASE_URL not set in .env file");
