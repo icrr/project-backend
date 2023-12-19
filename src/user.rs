@@ -3,7 +3,7 @@ use sqlx::PgPool;
 use serde::Serialize;
 
 #[derive(sqlx::FromRow, Serialize)]
-pub struct User {
+pub struct Users {
     id: i32,
     name: String,
     email: String,
@@ -11,7 +11,7 @@ pub struct User {
 }
 
 pub async fn list(db_pool: web::Data<PgPool>) -> HttpResponse {
-    match sqlx::query_as::<_, User>("SELECT * FROM users")
+    match sqlx::query_as::<_, Users>("SELECT * FROM users")
         .fetch_all(db_pool.get_ref())
         .await
     {
@@ -21,4 +21,17 @@ pub async fn list(db_pool: web::Data<PgPool>) -> HttpResponse {
             HttpResponse::InternalServerError().finish()
         }
     }
+}
+
+#[derive(sqlx::FromRow, Serialize)]
+pub struct CreateUser {
+    name: String,
+    email: String,
+    password: String
+}
+
+#[derive(sqlx::FromRow, Serialize)]
+pub struct LoginUser {
+    email: String,
+    password: String
 }
