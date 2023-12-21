@@ -30,6 +30,17 @@ pub struct CreateUser {
     password: String
 }
 
+pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<CreateUser>,) -> HttpResponse {
+    let new_user = web_form.into_inner();
+    
+    let query = sqlx::query(
+        "INSERT INTO users (name, email, password) VALUES ($1, $2, $3) RETURNING id, name, email",
+    )
+    .bind(&new_user.name)
+    .bind(&new_user.email)
+    .bind(&new_user.password);
+}
+
 #[derive(sqlx::FromRow, Serialize)]
 pub struct LoginUser {
     email: String,
