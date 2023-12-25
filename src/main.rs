@@ -12,6 +12,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(Data::new(db_pool.clone()))
             .service(web::scope("/app")
                 .route("/users", web::get().to(user::list))
+                .route("/users", web::post().to(user::create))
             )
     })
     .bind(("0.0.0.0", 8080))?
