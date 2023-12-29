@@ -68,3 +68,28 @@ pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<CreateUser>)
         }
     }
 }
+
+pub async fn delete(db_pool: web::Data<PgPool>, path: web::Path<i32>) -> HttpResponse {
+    let userd_id = path.into_inner();
+
+    let query = sqlx::query(
+        "DELETE FROM users WHERE id = $1 RETURNING id, name, email",
+    )
+    .bind(userd_id);
+
+    match query.fetch_one(db_pool.get_ref()).await {
+        Ok(user) => {
+            let deleted_user = Users {
+                id: user.get("id"),
+                name: user.get("name"),
+                email: user.get("email"),
+                password: user.get("password"),
+            };
+            HttpResponse::Ok().json(deleted_user)
+        }
+        Err(e) => {
+            eprintln!("Erro ao excluir usuário: {:?}", e);
+            HttpResponse::InternalServerError().finish()
+        }
+    }
+}

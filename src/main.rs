@@ -13,6 +13,7 @@ async fn main() -> std::io::Result<()> {
             .service(web::scope("/app")
                 .route("/users", web::get().to(user::list))
                 .route("/users", web::post().to(user::create))
+                .route("/users/{id}", web::delete().to(user::delete))
             )
     })
     .bind(("0.0.0.0", 8080))?
