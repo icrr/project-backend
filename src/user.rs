@@ -29,21 +29,9 @@ pub async fn list(db_pool: web::Data<PgPool>) -> HttpResponse {
     }
 }
 
-#[derive(Serialize)]
-pub struct CreatedUser {
-    id: i32,
-    name: String,
-    email: String,
-}
+_pub async fn put(db_pool: web::Data<PgPool>, web_form)
 
-#[derive(Deserialize)]
-pub struct CreateUser {
-    name: String,
-    email: String,
-    password: String,
-}
-
-pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<CreateUser>) -> HttpResponse {
+pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
     let new_user = web_form.into_inner();
 
     let query = sqlx::query(
@@ -55,10 +43,11 @@ pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<CreateUser>)
 
     match query.fetch_one(db_pool.get_ref()).await {
         Ok(user) => {
-            let created_user = CreatedUser {
+            let created_user = Users {
                 id: user.get("id"),
                 name: user.get("name"),
                 email: user.get("email"),
+                password: user.get("password"),
             };
             HttpResponse::Created().json(created_user)
         }

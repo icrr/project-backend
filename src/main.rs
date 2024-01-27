@@ -1,6 +1,7 @@
 use actix_web::{web, App, HttpServer};
 use actix_web::web::Data;
 mod user;
+use user::{list, put, delete, create};
 mod conn;
 
 #[actix_web::main]
@@ -11,12 +12,14 @@ async fn main() -> std::io::Result<()> {
         App::new()
             .app_data(Data::new(db_pool.clone()))
             .service(web::scope("/app")
-                .route("/users", web::get().to(user::list))
-                .route("/users", web::post().to(user::create))
-                .route("/users/{id}", web::delete().to(user::delete))
+                .route("/users", web::get().to(list))
+                .route("/users", web::post().to(create))
+                .route("/users/{id}", web::delete().to(delete))
+                .route("/users/{id}", web::put().to(put))
             )
     })
     .bind(("0.0.0.0", 8080))?
     .run()
     .await
 }
+
