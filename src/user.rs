@@ -29,7 +29,17 @@ pub async fn list(db_pool: web::Data<PgPool>) -> HttpResponse {
     }
 }
 
-_pub async fn put(db_pool: web::Data<PgPool>, web_form)
+_pub async fn put(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
+
+    let user_data = web_form.into_inner();
+
+    let query = sqlx::query(
+        "UPDATE users SET name = COALESCE($1, name), email = COALESCE($2, email), password = COALESCE($3, password) WHERE <sua_clausula_de_selecao>"
+    )
+    .bind(&user_data.name)
+    .bind(&user_data.email)
+    .bind(&user_data.password);
+}
 
 pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
     let new_user = web_form.into_inner();
