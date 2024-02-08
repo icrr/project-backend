@@ -1,7 +1,7 @@
 use actix_web::{web, App, HttpServer};
 use actix_web::web::Data;
 mod user;
-use user::{list, put, delete, create};
+use user::{list, put_name, delete, create};
 mod conn;
 
 #[actix_web::main]
@@ -15,7 +15,7 @@ async fn main() -> std::io::Result<()> {
                 .route("/users", web::get().to(list))
                 .route("/users", web::post().to(create))
                 .route("/users/{id}", web::delete().to(delete))
-                .route("/users/{id}", web::put().to(put))
+                .route("/users/{id}", web::put().to(put_name))
             )
     })
     .bind(("0.0.0.0", 8080))?

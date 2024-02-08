@@ -29,16 +29,34 @@ pub async fn list(db_pool: web::Data<PgPool>) -> HttpResponse {
     }
 }
 
-_pub async fn put(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
+pub async fn put_name(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
 
     let user_data = web_form.into_inner();
 
     let query = sqlx::query(
-        "UPDATE users SET name = COALESCE($1, name), email = COALESCE($2, email), password = COALESCE($3, password) WHERE <sua_clausula_de_selecao>"
+        "UPDATE users SET name = COALESCE($1, name) WHERE id = $2"
     )
     .bind(&user_data.name)
-    .bind(&user_data.email)
-    .bind(&user_data.password);
+    .bind(user_data.id);
+
+    if let Err(err) = query.execute(&**db_pool).await {
+        return HttpResponse::InternalServerError().body(format!("Erro no banco de dados: {}", err));
+    }
+
+    let updated_user = match sqlx::query_as::<_, Users>("SELECT * FROM users WHERE id = $2")
+        .bind(user_data.id)
+        .fetch_one(&**db_pool)
+        .await
+    {
+        Ok(user) => user,
+        Err(e) => {
+            eprintln!("Erro ao obter usuário atualizado: {:?}", e);
+            return HttpResponse::InternalServerError().finish();
+        }
+    };
+
+    HttpResponse::Ok().json(updated_user)
+
 }
 
 pub async fn create(db_pool: web::Data<PgPool>, web_form: web::Form<Users>) -> HttpResponse {
